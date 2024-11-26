@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -36,7 +37,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.allfix.ui.theme.AllFixTheme
+import com.example.allfix.features.fixlist.FixListScreen
+import com.example.allfix.features.fixlist.FixListViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -99,13 +103,13 @@ private fun App(){
     val screens = remember {
         listOf(
 //            NavItem(icon = Icons.Default.Add, label = "Add"),
-            ScreenItem.History,
             ScreenItem.Home,
-            ScreenItem.Profile)
+            ScreenItem.Profile,
+            ScreenItem.History,)
     }
 
     var currentScreen by remember {
-        mutableStateOf(screens[1])
+        mutableStateOf(screens[0])
     }
 
     val pagerState = rememberPagerState {
@@ -156,22 +160,17 @@ private fun App(){
         HorizontalPager(pagerState, Modifier.padding(innerPadding)) { page ->
             val item = screens[page]
             when (item){
-                ScreenItem.Home -> FixList()
-                ScreenItem.History -> History()
+                ScreenItem.Home -> {
+                    val viewModel = viewModel<FixListViewModel>()
+                    val state by viewModel.state.collectAsState()
+                    FixListScreen(state = state)
+                }
                 ScreenItem.Profile -> Profile()
+                ScreenItem.History -> History()
             }
 
         }
 
-    }
-}
-
-@Composable
-fun FixList(modifier: Modifier = Modifier){
-    Box(modifier.fillMaxSize()){
-        Text("Fix List", Modifier.align(Alignment.Center), style = TextStyle.Default.copy(
-            fontSize = 32.sp
-        ))
     }
 }
 
