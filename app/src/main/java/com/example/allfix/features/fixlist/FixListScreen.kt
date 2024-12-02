@@ -3,6 +3,7 @@ package com.example.allfix.features.fixlist
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -66,8 +67,9 @@ fun FixListScreen(state: FixListScreenState, modifier: Modifier = Modifier){
                     Row(Modifier
                         .fillMaxSize()
                         .height(86.dp)
-                        .border(border = BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(12.dp)),
-                        verticalAlignment = Alignment.CenterVertically){
+                        .border(border = BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(12.dp)).clickable(onClick = {}),
+                        verticalAlignment = Alignment.CenterVertically,
+                        ){
                         Spacer(Modifier.size(8.dp))
                         Box(Modifier
                             .clip(CircleShape)
@@ -109,14 +111,14 @@ private fun FixListScreenPreview(){
         Surface {
             FixListScreen(state = FixListScreenState.Success(
                 currentUser = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"),
-                fixes = listOf(Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"),
-                    Fixes(location = "valongo", price = 22.00F, user = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), descricao = "teste teste teste test", problem = "Problema de juntas"))
+                fixes = listOf(Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc= "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+                    Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null))
             ))
         }
     }
