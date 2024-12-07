@@ -38,9 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.allfix.features.fixdetails.FixDetailScreen
+import com.example.allfix.features.fixdetails.FixDetailViewModel
+import com.example.allfix.features.fixdetails.FixDetailViewModelFactory
 import com.example.allfix.ui.theme.AllFixTheme
-import com.example.allfix.features.fixlist.FixListScreen
-import com.example.allfix.features.fixlist.FixListViewModel
+import com.example.allfix.features.fixdetails.FixListScreen
+import com.example.allfix.features.fixdetails.FixListViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -97,6 +100,8 @@ sealed class ScreenItem(
     )
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun App(){
@@ -115,6 +120,19 @@ private fun App(){
     val pagerState = rememberPagerState {
         screens.size
     }
+
+    var selectedFixId by remember { mutableStateOf<String?>(null) }
+
+    // If a fix is selected, show the detail screen
+    if (selectedFixId != null) {
+        val viewModel: FixDetailViewModel = viewModel(
+            factory = FixDetailViewModelFactory(fixId = selectedFixId!!)
+        )
+        val state by viewModel.state.collectAsState()
+
+        // Pass the state to the FixDetailScreen Composable
+        FixDetailScreen(state = state)
+    }else{
     
     LaunchedEffect(currentScreen) {
         pagerState.animateScrollToPage(screens.indexOf(currentScreen))
@@ -163,7 +181,9 @@ private fun App(){
                 ScreenItem.Home -> {
                     val viewModel = viewModel<FixListViewModel>()
                     val state by viewModel.state.collectAsState()
-                    FixListScreen(state = state)
+                    FixListScreen(state = state, onFixClick = { fixId ->
+                        selectedFixId = fixId
+                    })
                 }
                 ScreenItem.Profile -> Profile()
                 ScreenItem.History -> History()
@@ -172,7 +192,9 @@ private fun App(){
         }
 
     }
+    }
 }
+
 
 @Composable
 fun Profile(modifier: Modifier = Modifier){

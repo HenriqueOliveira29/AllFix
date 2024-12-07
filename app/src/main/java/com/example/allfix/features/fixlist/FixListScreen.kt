@@ -1,4 +1,4 @@
-package com.example.allfix.features.fixlist
+package com.example.allfix.features.fixdetails
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FixListScreen(state: FixListScreenState, modifier: Modifier = Modifier){
+fun FixListScreen(state: FixListScreenState, onFixClick: (String) -> Unit, modifier: Modifier = Modifier){
     when(state)
     {
         FixListScreenState.Loading -> {
@@ -67,7 +67,10 @@ fun FixListScreen(state: FixListScreenState, modifier: Modifier = Modifier){
                     Row(Modifier
                         .fillMaxSize()
                         .height(86.dp)
-                        .border(border = BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(12.dp)).clickable(onClick = {}),
+                        .border(border = BorderStroke(1.dp, Color.Gray), shape = RoundedCornerShape(12.dp)).clickable {
+                        // Handle fix item click
+                            onFixClick(fix.id)
+                        },
                         verticalAlignment = Alignment.CenterVertically,
                         ){
                         Spacer(Modifier.size(8.dp))
@@ -101,6 +104,8 @@ fun FixListScreen(state: FixListScreenState, modifier: Modifier = Modifier){
                 }
             }
         }
+
+        else -> {}
     }
 }
 
@@ -119,7 +124,7 @@ private fun FixListScreenPreview(){
                     Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
                     Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
                     Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null))
-            ))
+            ), onFixClick = {})
         }
     }
 }
@@ -129,7 +134,7 @@ private fun FixListScreenPreview(){
 private fun FixListScreenPreviewIfLoadingState(){
     AllFixTheme {
         Surface {
-            FixListScreen(state = FixListScreenState.Loading)
+            FixListScreen(state = FixListScreenState.Loading, onFixClick = {})
         }
     }
 }

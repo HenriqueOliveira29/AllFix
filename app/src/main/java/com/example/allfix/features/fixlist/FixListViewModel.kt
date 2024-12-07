@@ -1,10 +1,7 @@
-package com.example.allfix.features.fixlist
+package com.example.allfix.features.fixdetails
 
-import android.R
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.allfix.ui.theme.Typography
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.delay
@@ -25,6 +22,7 @@ sealed class FixListScreenState {
 }
 
 class Fixes(
+    val id: String = "",
     val problem: String = "",
     val location: String = "",
     val price: Float = 0F,
@@ -107,6 +105,7 @@ class FixListViewModel : ViewModel(){
 
             // Create the Fixes object
             Fixes(
+                id = document.id,
                 location = document.getString("location").toString() ?: "",
                 price = document.getDouble("price")?.toFloat() ?: 0.0F,
                 creator = user,
