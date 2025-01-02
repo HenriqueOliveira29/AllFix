@@ -1,4 +1,4 @@
-package com.example.allfix.features.fixdetails
+package com.example.allfix.features.History
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.allfix.features.fixdetails.Fixes
+import com.example.allfix.features.fixdetails.Type
+import com.example.allfix.features.fixdetails.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.delay
@@ -19,58 +22,35 @@ import com.google.firebase.auth.FirebaseUser
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-sealed class FixListScreenState {
-    data object Loading : FixListScreenState()
+sealed class HistoryScreenState {
+    data object Loading : HistoryScreenState()
     data class Success(
         val currentUser: User,
-        val searchText: String = "",
         val fixes: List<Fixes> = emptyList(),
-    ) : FixListScreenState()
+    ) : HistoryScreenState()
 }
 
-class Fixes(
-    var id: String = "",
-    var problem: String = "",
-    var location: String = "",
-    var price: Float = 0F,
-    var creator: User = User(),
-    var desc: String = "",
-    var images: List<String> = emptyList(),
-    var date: String = "",
-    var fixer: User? = null,
-)
-
-class User(
-    val id: String = "",
-    val Uid: String = "",
-    val avatar: String = "",
-    val name: String = "",
-    val type: Type = Type.USER,
-)
-
-enum class Type{ FIXER, USER }
-
-class FixListViewModelFactory(private val currentUser: FirebaseUser) : ViewModelProvider.Factory {
+class HistoryViewModelFactory(private val currentUser: FirebaseUser) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return FixListViewModel(currentUser) as T
+        return HistoryViewModel(currentUser) as T
     }
 }
 
-class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
-    private val _state = MutableStateFlow<FixListScreenState>(FixListScreenState.Loading)
+class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
+    private val _state = MutableStateFlow<HistoryScreenState>(HistoryScreenState.Loading)
     val state = _state.asStateFlow()
     val db = Firebase.firestore
 
 
     init{
         viewModelScope.launch{
-            val fixes = fetchFixes()
             val currentUserDb = fetchUser(currentUser)
+            val fixes = fetchFixes(currentUserDb)
+
             _state.update {
-                FixListScreenState.Success(
+                HistoryScreenState.Success(
                     currentUser = currentUserDb,
                     fixes = fixes,
-                    searchText = ""
                 )
             }
         }
@@ -84,7 +64,6 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
         return suspendCoroutine { continuation ->
             userDocRef.get().addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
-                    Log.d("Warning", "entrou")
                     // Assuming that there will be only one document matching the Uid
                     val document = querySnapshot.documents.first()
                     val user = User(
@@ -121,21 +100,42 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
         }
     }
 
-    private suspend fun fetchFixes(): List<Fixes> {
-        var data =  db.collection("fixes").get().await()
+    private suspend fun fetchFixes(currentUser: User): List<Fixes> {
+        val userRef = db.collection("users").document(currentUser.id)
 
-        val fixesList = data.documents.map { document ->
+        val query = if (currentUser.type == Type.FIXER) {
+            Log.d("Warning", currentUser.id)
+            Log.d("Warning", currentUser.type.name)
+            // If the user is a fixer, fetch the fixes where the 'fixer' field matches the currentUser
+            db.collection("fixes")
+                .whereEqualTo("fixer", userRef)  // Use DocumentReference
+                .get()
+                .await()
+        } else {
+            // If the user is a regular user, fetch the fixes where the 'creator' field matches the currentUser
+            db.collection("fixes")
+                .whereEqualTo("creator", userRef)  // Use DocumentReference
+                .get()
+                .await()
+        }
+
+        val fixesList = query.documents.map { document ->
             // Assuming you also have a nested "user" field that is a map of User data
             val userReference = document.getDocumentReference("creator")
             var user : User = User()  // Default empty user object
-
+            Log.d("Warning","nada")
             // If user reference is not null, fetch the user data
             if (userReference != null) {
                 try {
                     val userSnapshot = userReference.get().await()
                     if (userSnapshot.exists()) {
                         // Extract user data from the user document
-                        user = userSnapshot.toObject(User::class.java) ?: User()
+                        user = User(
+                            id = document.reference.id,
+                            Uid = document.getString("UID") ?: "",
+                            avatar = document.getString("avatar") ?: "",
+                            name = document.getString("name") ?: "",
+                            type = Type.USER)
                     }
                 } catch (e: Exception) {
                     // Handle the error if fetching the user data fails
@@ -153,7 +153,12 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
                     val userSnapshot = fixerReference.get().await()
                     if (userSnapshot.exists()) {
                         // Extract user data from the user document
-                        fixer = userSnapshot.toObject(User::class.java) ?: null
+                        fixer = User(
+                            id = document.reference.id,
+                            Uid = document.getString("UID") ?: "",
+                            avatar = document.getString("avatar") ?: "",
+                            name = document.getString("name") ?: "",
+                            type = Type.FIXER)
                     }
                 } catch (e: Exception) {
                     // Handle the error if fetching the user data fails

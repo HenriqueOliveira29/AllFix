@@ -17,7 +17,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.example.allfix.features.History.HistoryScreen
+import com.example.allfix.features.History.HistoryViewModel
+import com.example.allfix.features.History.HistoryViewModelFactory
 import com.example.allfix.features.Login.LoginScreen
+import com.example.allfix.features.Profile.ProfileScreen
+import com.example.allfix.features.Profile.ProfileViewModel
+import com.example.allfix.features.Profile.ProfileViewModelFactory
 import com.example.allfix.features.fixdetails.FixDetailScreen
 import com.example.allfix.features.fixdetails.FixDetailViewModel
 import com.example.allfix.features.fixdetails.FixDetailViewModelFactory
@@ -54,12 +60,25 @@ fun AppNavigation(navController: NavHostController, currentUser: FirebaseUser?) 
 
             FixListScreen(state = state, navController)
         }
-        //composable(Routes.Create.route) {
-          //  Ecra01(registros = registros, navController = navController)
-        //}
-        //composable(Routes.Details.route) {
-            //Ecra02(registros = registros, navController = navController)
-        //}
+        composable(Routes.Profile.route) {
+            Log.d("Warning", "heeelllooo")
+            val profileViewModel: ProfileViewModel = viewModel(
+                factory = ProfileViewModelFactory(currentUser!!)
+            )
+
+            val state by profileViewModel.state.collectAsState()
+
+            ProfileScreen(state = state, navController)
+        }
+        composable(Routes.History.route) {
+            val historyViewModel: HistoryViewModel = viewModel(
+                factory = HistoryViewModelFactory(currentUser!!)
+            )
+
+            val state by historyViewModel.state.collectAsState()
+
+            HistoryScreen(state = state, navController)
+        }
         composable(
             "Details/{selectedFix}",
             arguments = listOf(navArgument("selectedFix") { type = NavType.StringType })
