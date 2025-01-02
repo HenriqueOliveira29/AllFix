@@ -1,6 +1,9 @@
 package com.example.allfix
 
+import AppNavigation
+import Routes
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,46 +12,45 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.House
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.allfix.features.fixdetails.FixDetailScreen
-import com.example.allfix.features.fixdetails.FixDetailViewModel
-import com.example.allfix.features.fixdetails.FixDetailViewModelFactory
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.allfix.ui.theme.AllFixTheme
-import com.example.allfix.features.fixdetails.FixListScreen
-import com.example.allfix.features.fixdetails.FixListViewModel
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         enableEdgeToEdge()
         setContent {
             AllFixTheme {
@@ -58,140 +60,101 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class BottomAppBarItem(
-    val label: String,
-    val icon: ImageVector
-)
-
-class TopAppBarItem(
-    val title: String,
-    val icons: List<ImageVector> = emptyList()
-)
-
-sealed class ScreenItem(
-    val topAppItem: TopAppBarItem,
-    val bottomAppItem: BottomAppBarItem
-
-) {
-    data object Home : ScreenItem(
-        topAppItem = TopAppBarItem(title = "FixAll", icons = listOf(Icons.AutoMirrored.Default.ExitToApp)),
-        bottomAppItem = BottomAppBarItem(
-            icon = Icons.Default.House,
-            label = "Home"
-        )
-
-    )
-
-    data object History : ScreenItem(
-        topAppItem = TopAppBarItem(title = "FixAll", icons = listOf(Icons.AutoMirrored.Default.ExitToApp)),
-        bottomAppItem = BottomAppBarItem(
-            icon = Icons.Default.AccessTime,
-            label = "History"
-        )
-
-    )
-
-    data object Profile : ScreenItem(
-        topAppItem = TopAppBarItem(title = "FixAll", icons = listOf(Icons.AutoMirrored.Default.ExitToApp)),
-        bottomAppItem = BottomAppBarItem(
-            icon = Icons.Default.Person,
-            label = "Profile"
-        )
-    )
-}
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun App(){
-    val screens = remember {
-        listOf(
-//            NavItem(icon = Icons.Default.Add, label = "Add"),
-            ScreenItem.Home,
-            ScreenItem.Profile,
-            ScreenItem.History,)
-    }
-
-    var currentScreen by remember {
-        mutableStateOf(screens[0])
-    }
-
-    val pagerState = rememberPagerState {
-        screens.size
-    }
-
     var selectedFixId by remember { mutableStateOf<String?>(null) }
+    val navController = rememberNavController()
+    val auth = FirebaseAuth.getInstance()
 
-    // If a fix is selected, show the detail screen
-    if (selectedFixId != null) {
-        val viewModel: FixDetailViewModel = viewModel(
-            factory = FixDetailViewModelFactory(fixId = selectedFixId!!)
-        )
-        val state by viewModel.state.collectAsState()
+    var currentUser by remember { mutableStateOf(auth.currentUser) }
 
-        // Pass the state to the FixDetailScreen Composable
-        FixDetailScreen(state = state)
-    }else{
-    
-    LaunchedEffect(currentScreen) {
-        pagerState.animateScrollToPage(screens.indexOf(currentScreen))
+    DisposableEffect(auth) {
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            currentUser = firebaseAuth.currentUser
+        }
+        auth.addAuthStateListener(listener)
+
+        onDispose {
+            auth.removeAuthStateListener(listener)
+        }
     }
 
-    LaunchedEffect(pagerState.targetPage) {
-        currentScreen = screens[pagerState.targetPage]
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            navController.navigate(Routes.Home.route) {
+                popUpTo(0)
+            }
+        } else {
+            navController.navigate(Routes.Login.route) {
+                popUpTo(0)
+            }
+        }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(currentScreen.topAppItem.title) }, actions = {
+            TopAppBar(title = { Text("FixAll") },navigationIcon = {
+                // Show back arrow only if a FixDetailScreen is selected
+                if (selectedFixId != null) {
+                    IconButton(
+                        onClick = {
+                            selectedFixId = null // Go back to the list
+                        }
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            }, actions = {
+
                 Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    currentScreen.topAppItem.icons.forEach{ icon ->
-                        Icon(icon, contentDescription = null)
+                    if (currentUser != null) {
+                        Button(onClick = {
+                            auth.signOut()
+                            currentUser = null
+                            navController.navigate(Routes.Login.route) {
+                                popUpTo(0)
+                            }
+                        }) {
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
+                        }
                     }
                 }
             })
         },
         bottomBar = {
-            BottomAppBar {
-                screens.forEach{ screen ->
-                    with(screen.bottomAppItem) {
-                        NavigationBarItem(
-                            selected = screen == currentScreen,
-                            onClick = {
-                                currentScreen = screen
-                            },
-                            icon = {
-                                Icon(icon, contentDescription = null)
-                            },
-                            label = {
-                                Text(label)
-                            }
-                        )
+                BottomNavigationBar(navController, Routes.toList)
+        },
+        content = { padding ->
+            Box(modifier = Modifier.padding(padding)) {
+                AppNavigation(navController = navController, currentUser = currentUser)
+            }
+        }
+    )
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController, appItems: List<Routes>) {
+    BottomAppBar(
+    ) {
+        appItems.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(text = item.title) },
+                selected = false,
+                onClick = {
+                    navController.navigate(item.route) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-
                 }
-            }
+            )
         }
-    ) { innerPadding ->
-        HorizontalPager(pagerState, Modifier.padding(innerPadding)) { page ->
-            val item = screens[page]
-            when (item){
-                ScreenItem.Home -> {
-                    val viewModel = viewModel<FixListViewModel>()
-                    val state by viewModel.state.collectAsState()
-                    FixListScreen(state = state, onFixClick = { fixId ->
-                        selectedFixId = fixId
-                    })
-                }
-                ScreenItem.Profile -> Profile()
-                ScreenItem.History -> History()
-            }
-
-        }
-
-    }
     }
 }
 

@@ -1,5 +1,7 @@
 package com.example.allfix.features.fixdetails
 
+import Routes
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,20 +19,25 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FixDetailScreen(state: FixDetailScreenState, modifier: Modifier = Modifier){
+fun FixDetailScreen(
+    state: FixDetailScreenState,
+    navController: NavController,
+    modifier: Modifier = Modifier,
+){
     when(state)
     {
-        FixDetailScreenState.Loading -> {
+        is FixDetailScreenState.Loading -> {
             Box(modifier.fillMaxSize()){
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
@@ -42,8 +48,11 @@ fun FixDetailScreen(state: FixDetailScreenState, modifier: Modifier = Modifier){
                 topBar = {
                     TopAppBar(title = { Text("FixALL") },
                         navigationIcon = {
+
                             // Arrow Back Icon on the left side of the top bar
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {
+                                navController.navigate(Routes.Home.route)
+                            }) {
                                 Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                             }
                         },
@@ -114,6 +123,11 @@ fun FixDetailScreen(state: FixDetailScreenState, modifier: Modifier = Modifier){
 
 
         }
+
+        is FixDetailScreenState.Error -> {
+            Log.d("Warn", state.message)
+            Text("ERROR: ${state.message.toString()}")
+        }
     }
 }
 
@@ -123,8 +137,8 @@ private fun FixListScreenPreview(){
     AllFixTheme {
         Surface {
             FixDetailScreen(state = FixDetailScreenState.Success(
-                fix = Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null)
-            ))
+                fix = Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+            ), navController = rememberNavController())
         }
     }
 }
@@ -134,7 +148,7 @@ private fun FixListScreenPreview(){
 private fun FixListScreenPreviewIfLoadingState(){
     AllFixTheme {
         Surface {
-            FixDetailScreen(state = FixDetailScreenState.Loading)
+            FixDetailScreen(state = FixDetailScreenState.Loading, navController = rememberNavController())
         }
     }
 }
