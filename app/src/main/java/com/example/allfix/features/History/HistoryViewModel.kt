@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.allfix.features.fixdetails.Fixes
+import com.example.allfix.features.fixdetails.State
 import com.example.allfix.features.fixdetails.Type
 import com.example.allfix.features.fixdetails.User
 import com.google.firebase.Firebase
@@ -104,17 +105,15 @@ class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
         val userRef = db.collection("users").document(currentUser.id)
 
         val query = if (currentUser.type == Type.FIXER) {
-            Log.d("Warning", currentUser.id)
-            Log.d("Warning", currentUser.type.name)
             // If the user is a fixer, fetch the fixes where the 'fixer' field matches the currentUser
             db.collection("fixes")
-                .whereEqualTo("fixer", userRef)  // Use DocumentReference
+                .whereEqualTo("fixer", userRef).whereEqualTo("state", State.DONE)
                 .get()
                 .await()
         } else {
             // If the user is a regular user, fetch the fixes where the 'creator' field matches the currentUser
             db.collection("fixes")
-                .whereEqualTo("creator", userRef)  // Use DocumentReference
+                .whereEqualTo("creator", userRef).whereEqualTo("state", State.DONE)
                 .get()
                 .await()
         }
@@ -175,8 +174,8 @@ class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
                 desc = document.getString("desc").toString() ?: "",
                 problem = document.getString("problem").toString() ?: "",
                 date = document.getTimestamp("Date")?.toDate().toString() ?: "",
-                fixer = fixer
-
+                fixer = fixer,
+                state = State.valueOf(document.getString("state").toString()) ?: State.NEWER
             )
         }
         // Return the list of Fixes objects

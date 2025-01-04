@@ -124,16 +124,18 @@ fun FixListScreen(state: FixListScreenState, navController: NavController, modif
                     }
                 }
                 }
-                FloatingActionButton(
-                    onClick = {
-                        // Handle action when button is clicked
-                        isCreatingFix = true
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp) // Optional padding for spacing
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = "New Conversation") // Plus icon
+                if (state.currentUser.type.name == "USER"){
+                    FloatingActionButton(
+                        onClick = {
+                            // Handle action when button is clicked
+                            isCreatingFix = true
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp) // Optional padding for spacing
+                    ) {
+                        Icon(Icons.Filled.Add, contentDescription = "New Conversation") // Plus icon
+                    }
                 }
 
                 if (isCreatingFix) {
@@ -264,7 +266,8 @@ private fun createFixDb(fix: Fixes, currentUser: User, onComplete: (Boolean) -> 
         "desc" to fix.desc,
         "images" to fix.images,
         "date" to Timestamp.now(),
-        "fixer" to null
+        "fixer" to null,
+        "state" to fix.state.name
     )
 
     // Save the Fix object to Firestore

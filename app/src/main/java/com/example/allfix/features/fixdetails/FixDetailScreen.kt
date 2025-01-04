@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,8 +35,30 @@ import androidx.navigation.compose.rememberNavController
 fun FixDetailScreen(
     state: FixDetailScreenState,
     navController: NavController,
+    viewModel: FixDetailViewModel,
     modifier: Modifier = Modifier,
 ){
+    fun FixState(fix: Fixes, currentUser: User){
+        if(fix.state.name == "INPROGRESS" && currentUser.type.name == "USER"){
+            fix.state = State.DONE
+        }
+        if(fix.state.name == "TODO" && currentUser.type.name == "FIXER"){
+            fix.state = State.INPROGRESS
+        }
+        if(fix.state.name == "NEWER" && currentUser.type.name == "FIXER"){
+            fix.state = State.TODO
+            fix.fixer = currentUser
+        }
+        viewModel.updateFix(fix, currentUser)
+    }
+
+    fun CancelState(fix: Fixes, currentUser: User){
+        if(fix.state.name != "DONE" && fix.state.name != "NEWER"){
+            fix.state = State.NEWER
+        }
+        viewModel.updateFix(fix, currentUser)
+    }
+
     when(state)
     {
         is FixDetailScreenState.Loading -> {
@@ -118,7 +142,21 @@ fun FixDetailScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
+                    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                        if(state.fix.state != State.INPROGRESS && state.fix.state != State.DONE){
+                            Button(onClick = {FixState(state.fix, state.currentUser)}) {
+                                Text(if(state.fix.state == State.NEWER)"FIX" else if (state.fix.state == State.TODO) "START" else "DONE")
+                            }
+                        }
+
+                        if(state.fix.state != State.NEWER && state.fix.state != State.DONE){
+                            Button(onClick = {CancelState(state.fix, state.currentUser)}) {
+                                Text("CANCEL")
+                            }
+                        }
+                    }
                 }
+
             }
 
 
@@ -134,21 +172,22 @@ fun FixDetailScreen(
 @Preview
 @Composable
 private fun FixListScreenPreview(){
-    AllFixTheme {
-        Surface {
-            FixDetailScreen(state = FixDetailScreenState.Success(
-                fix = Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
-            ), navController = rememberNavController())
-        }
-    }
+//    AllFixTheme {
+//        Surface {
+//            FixDetailScreen(state = FixDetailScreenState.Success(
+//                fix = Fixes(location = "valongo", price = 22.00F, creator = User(id = "123", name = "henrique", type = Type.USER, avatar = "teste"), desc = "teste teste teste test", problem = "Problema de juntas", date = "teste", fixer = null),
+//                currentUser = User()
+//            ), navController = rememberNavController(), viewModel = FixDetailViewModel())
+//        }
+//    }
 }
 
 @Preview
 @Composable
 private fun FixListScreenPreviewIfLoadingState(){
-    AllFixTheme {
-        Surface {
-            FixDetailScreen(state = FixDetailScreenState.Loading, navController = rememberNavController())
-        }
-    }
+//    AllFixTheme {
+//        Surface {
+//            FixDetailScreen(state = FixDetailScreenState.Loading, navController = rememberNavController())
+//        }
+//    }
 }

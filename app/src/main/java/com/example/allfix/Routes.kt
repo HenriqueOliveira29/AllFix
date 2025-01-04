@@ -86,12 +86,12 @@ fun AppNavigation(navController: NavHostController, currentUser: FirebaseUser?) 
             val selectedFix = backStackEntry.arguments?.getString("selectedFix") ?: ""
 
             val viewModel: FixDetailViewModel = viewModel(
-                factory = FixDetailViewModelFactory(fixId = selectedFix)
+                factory = FixDetailViewModelFactory(fixId = selectedFix, currentUser = currentUser!!)
             )
             val state by viewModel.state.collectAsState()
 
             // Pass the state to the FixDetailScreen Composable
-            FixDetailScreen(state = state, navController)
+            FixDetailScreen(state = state, navController, viewModel)
         }
     }
 }

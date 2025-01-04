@@ -38,6 +38,7 @@ class Fixes(
     var images: List<String> = emptyList(),
     var date: String = "",
     var fixer: User? = null,
+    var state: State = State.NEWER
 )
 
 class User(
@@ -49,6 +50,8 @@ class User(
 )
 
 enum class Type{ FIXER, USER }
+
+enum class State{NEWER, TODO, INPROGRESS, DONE}
 
 class FixListViewModelFactory(private val currentUser: FirebaseUser) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -92,7 +95,7 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
                         Uid = document.getString("UID") ?: uid,
                         avatar = document.getString("avatar") ?: "",
                         name = document.getString("name") ?: "",
-                        type = if (document.getString("type") == "FIXER") Type.FIXER else Type.USER
+                        type = if (document.getString("type") == "FIXER") Type.FIXER else Type.USER,
                     )
                     continuation.resume(user)
                 } else {
@@ -122,7 +125,7 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
     }
 
     private suspend fun fetchFixes(): List<Fixes> {
-        var data =  db.collection("fixes").get().await()
+        var data =  db.collection("fixes").whereEqualTo("state", State.NEWER).get().await()
 
         val fixesList = data.documents.map { document ->
             // Assuming you also have a nested "user" field that is a map of User data
@@ -170,8 +173,8 @@ class FixListViewModel(currentUser: FirebaseUser) : ViewModel(){
                 desc = document.getString("desc").toString() ?: "",
                 problem = document.getString("problem").toString() ?: "",
                 date = document.getTimestamp("Date")?.toDate().toString() ?: "",
-                fixer = fixer
-
+                fixer = fixer,
+                state = State.valueOf(document.getString("state").toString()) ?: State.NEWER
             )
         }
         // Return the list of Fixes objects
