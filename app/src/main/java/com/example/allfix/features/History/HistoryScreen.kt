@@ -4,6 +4,7 @@ import com.example.allfix.features.fixdetails.Fixes
 import com.example.allfix.features.fixdetails.Type
 import com.example.allfix.features.fixdetails.User
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,9 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.allfix.ui.theme.AllFixTheme
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 
 @Composable
 fun HistoryScreen(state: HistoryScreenState, navController: NavController, modifier: Modifier = Modifier){
@@ -70,7 +69,18 @@ fun HistoryScreen(state: HistoryScreenState, navController: NavController, modif
                             Box(Modifier
                                 .clip(CircleShape)
                                 .size(56.dp)
-                                .background(Color.Gray))
+                                .background(Color.Gray)){
+                                Image(
+                                    painter = rememberImagePainter(
+                                        data = fix.creator.avatar,
+                                        builder = {
+                                            crossfade(true)
+                                        }
+                                    ),
+                                    contentDescription = "Fix Avatar",
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
                             Spacer(Modifier.size(8.dp))
                             Column(
                                 Modifier.heightIn(64.dp),

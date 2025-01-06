@@ -55,6 +55,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import coil.compose.rememberImagePainter
 
 @Composable
 fun FixListScreen(state: FixListScreenState, navController: NavController, modifier: Modifier = Modifier){
@@ -98,7 +101,18 @@ fun FixListScreen(state: FixListScreenState, navController: NavController, modif
                         Box(Modifier
                             .clip(CircleShape)
                             .size(56.dp)
-                            .background(Color.Gray))
+                            .background(Color.Gray)){
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = fix.creator.avatar,
+                                    builder = {
+                                        crossfade(true)
+                                    }
+                                ),
+                                contentDescription = "Fix Avatar",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                         Spacer(Modifier.size(8.dp))
                         Column(
                             Modifier.heightIn(64.dp),

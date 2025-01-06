@@ -66,6 +66,7 @@ class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
             userDocRef.get().addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     // Assuming that there will be only one document matching the Uid
+                    Log.d("Warning", "teste $uid")
                     val document = querySnapshot.documents.first()
                     val user = User(
                         id = document.reference.id,
@@ -103,7 +104,6 @@ class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
 
     private suspend fun fetchFixes(currentUser: User): List<Fixes> {
         val userRef = db.collection("users").document(currentUser.id)
-
         val query = if (currentUser.type == Type.FIXER) {
             // If the user is a fixer, fetch the fixes where the 'fixer' field matches the currentUser
             db.collection("fixes")
@@ -112,6 +112,7 @@ class HistoryViewModel(currentUser: FirebaseUser) : ViewModel(){
                 .await()
         } else {
             // If the user is a regular user, fetch the fixes where the 'creator' field matches the currentUser
+            Log.d("Warning", currentUser.id)
             db.collection("fixes")
                 .whereEqualTo("creator", userRef).whereEqualTo("state", State.DONE)
                 .get()

@@ -125,7 +125,10 @@ private fun App(){
             })
         },
         bottomBar = {
+            if (currentUser != null){
                 BottomNavigationBar(navController, Routes.toList)
+            }
+
         },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
@@ -140,20 +143,20 @@ fun BottomNavigationBar(navController: NavController, appItems: List<Routes>) {
     BottomAppBar(
     ) {
         appItems.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(text = item.title) },
-                selected = false,
-                onClick = {
-                    navController.navigate(item.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) { saveState = true }
+                NavigationBarItem(
+                    icon = { Icon(item.icon, contentDescription = item.title) },
+                    label = { Text(text = item.title) },
+                    selected = false,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) { saveState = true }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
         }
     }
 }

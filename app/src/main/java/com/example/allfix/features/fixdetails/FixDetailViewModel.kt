@@ -102,12 +102,13 @@ class FixDetailViewModel(private var fixId: String, currentUser: FirebaseUser)  
             }
 
             // Create and return Fixes object
+            Log.d("Warning", "teste user ${user.name}")
             return Fixes(
                 id = document.id,
                 location = document.getString("location").orEmpty(),
                 price = document.getDouble("price")?.toFloat() ?: 0.0F,
                 creator = user,
-                desc = document.getString("description").orEmpty(),
+                desc = document.getString("desc").orEmpty(),
                 problem = document.getString("problem").orEmpty(),
                 date = document.getTimestamp("date")?.toDate()?.toGMTString() ?: "",
                 fixer = fixer,

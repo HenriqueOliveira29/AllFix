@@ -2,6 +2,8 @@ package com.example.allfix.features.fixdetails
 
 import Routes
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
@@ -26,9 +30,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,6 +140,21 @@ fun FixDetailScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
+                        Box(Modifier
+                            .clip(CircleShape)
+                            .size(56.dp)
+                            .background(Color.Gray)){
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = creator.avatar,
+                                    builder = {
+                                        crossfade(true)
+                                    }
+                                ),
+                                contentDescription = "Fix Avatar",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     }
 
                     state.fix.fixer?.let { fixer ->
@@ -141,9 +163,24 @@ fun FixDetailScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
+                        Box(Modifier
+                            .clip(CircleShape)
+                            .size(56.dp)
+                            .background(Color.Gray)){
+                            Image(
+                                painter = rememberImagePainter(
+                                    data = fixer.avatar,
+                                    builder = {
+                                        crossfade(true)
+                                    }
+                                ),
+                                contentDescription = "Fix Avatar",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     }
                     Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                        if(state.fix.state != State.INPROGRESS && state.fix.state != State.DONE){
+                        if(state.fix.state != State.INPROGRESS && state.fix.state != State.DONE && state.currentUser.type != Type.USER){
                             Button(onClick = {FixState(state.fix, state.currentUser)}) {
                                 Text(if(state.fix.state == State.NEWER)"FIX" else if (state.fix.state == State.TODO) "START" else "DONE")
                             }
