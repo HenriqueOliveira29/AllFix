@@ -1,7 +1,5 @@
 package com.example.allfix.features.fixdetails
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,9 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +52,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import coil.compose.rememberImagePainter
 
 @Composable

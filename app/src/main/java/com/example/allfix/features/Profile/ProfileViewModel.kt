@@ -1,12 +1,10 @@
 package com.example.allfix.features.Profile
 
-import com.example.allfix.features.fixdetails.Fixes
 import com.example.allfix.features.fixdetails.User
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.allfix.features.fixdetails.FixListScreenState
 import com.example.allfix.features.fixdetails.Type
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser

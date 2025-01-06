@@ -1,24 +1,20 @@
 package com.example.allfix.features.History
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.allfix.features.fixdetails.Fixes
 import com.example.allfix.features.fixdetails.State
 import com.example.allfix.features.fixdetails.Type
 import com.example.allfix.features.fixdetails.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlin.random.Random
 import com.google.firebase.auth.FirebaseUser
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine

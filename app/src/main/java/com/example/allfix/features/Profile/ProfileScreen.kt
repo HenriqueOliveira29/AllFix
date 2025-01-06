@@ -1,6 +1,5 @@
 package com.example.allfix.features.Profile
 
-import Routes
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
