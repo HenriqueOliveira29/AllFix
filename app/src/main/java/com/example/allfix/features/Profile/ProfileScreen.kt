@@ -3,18 +3,24 @@ package com.example.allfix.features.Profile
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.allfix.ui.theme.AllFixTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.allfix.features.fixdetails.User
 import com.example.allfix.features.fixdetails.Type
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +42,7 @@ fun ProfileScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
 ){
+    val auth = FirebaseAuth.getInstance()
     when(state)
     {
         is ProfileScreenState.Loading -> {
@@ -79,6 +87,19 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+
+                    Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        if (state.currentUser != null) {
+                            Button(onClick = {
+                                auth.signOut()
+                                navController.navigate(Routes.Login.route) {
+                                    popUpTo(0)
+                                }
+                            }) {
+                                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
+                            }
+                        }
+                    }
                 }
             }
 

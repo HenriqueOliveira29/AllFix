@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -111,15 +113,11 @@ private fun App(){
 
                 Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     if (currentUser != null) {
-                        Button(onClick = {
-                            auth.signOut()
-                            currentUser = null
-                            navController.navigate(Routes.Login.route) {
+                        Icon(Icons.Default.Person, contentDescription = null, Modifier.clickable(onClick = {
+                            navController.navigate(Routes.Profile.route) {
                                 popUpTo(0)
                             }
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
-                        }
+                        }))
                     }
                 }
             })

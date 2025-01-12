@@ -2,6 +2,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
@@ -21,6 +22,9 @@ import com.example.allfix.features.History.HistoryScreen
 import com.example.allfix.features.History.HistoryViewModel
 import com.example.allfix.features.History.HistoryViewModelFactory
 import com.example.allfix.features.Login.LoginScreen
+import com.example.allfix.features.MyFixes.MyFixesScreen
+import com.example.allfix.features.MyFixes.MyFixesViewModel
+import com.example.allfix.features.MyFixes.MyFixesViewModelFactory
 import com.example.allfix.features.Profile.ProfileScreen
 import com.example.allfix.features.Profile.ProfileViewModel
 import com.example.allfix.features.Profile.ProfileViewModelFactory
@@ -40,9 +44,10 @@ sealed class Routes(val route: String, val icon: ImageVector, val title: String,
     object History : Routes(route = "History", icon = Icons.Default.History, title = "History", bottomBar = true)
     object Profile : Routes(route = "Profile", icon = Icons.Default.Person, title = "Profile", bottomBar = true)
     object Login : Routes(route = "Login", icon = Icons.Default.Login, title = "Login", bottomBar = false)
+    object MyFixes : Routes(route = "MyFixes", icon = Icons.Default.Archive, title = "MyFixes", bottomBar = false)
 
     companion object {
-        val toList = listOf(Home,History, Profile)
+        val toList = listOf(Home,History, MyFixes)
     }
 }
 
@@ -78,6 +83,15 @@ fun AppNavigation(navController: NavHostController, currentUser: FirebaseUser?) 
             val state by historyViewModel.state.collectAsState()
 
             HistoryScreen(state = state, navController)
+        }
+        composable(Routes.MyFixes.route) {
+            val myFixesViewModel: MyFixesViewModel = viewModel(
+                factory = MyFixesViewModelFactory(currentUser!!)
+            )
+
+            val state by myFixesViewModel.state.collectAsState()
+
+            MyFixesScreen(state = state, navController)
         }
         composable(
             "Details/{selectedFix}",
