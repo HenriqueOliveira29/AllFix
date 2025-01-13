@@ -35,15 +35,14 @@ fun LoginScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground), // Substitua "logo" pelo nome do arquivo da sua imagem
-            contentDescription = "Logo do App",
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Logo",
             modifier = Modifier
-                .size(200.dp) // Define o tamanho da imagem
+                .size(200.dp)
                 .padding(top = 40.dp, bottom = 16.dp)
         )
 
         if (isLoginMode) {
-            // Tela de Login
             LoginForm(
                 email = email,
                 onEmailChange = { email = it },
@@ -59,17 +58,16 @@ fun LoginScreen(navController: NavHostController) {
                                     navController.popBackStack()
                                     navController.navigate(Routes.Home.route)
                                 } else {
-                                    Toast.makeText(navController.context, "Falha no login: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(navController.context, "No login: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                     } else {
-                        Toast.makeText(navController.context, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Please field the required fields", Toast.LENGTH_SHORT).show()
                     }
                 },
                 onSwitchToRegisterClick = { isLoginMode = false }
             )
         } else {
-            // Criar CONTA
             RegisterForm(
                 email = email,
                 onEmailChange = { email = it },
@@ -86,11 +84,11 @@ fun LoginScreen(navController: NavHostController) {
                                 if (task.isSuccessful) {
                                     navController.navigate(Routes.Login.route)
                                 } else {
-                                    Toast.makeText(navController.context, "Falha no cadastro: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(navController.context, "Register Fail: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                     } else {
-                        Toast.makeText(navController.context, "Por favor, preencha todos os campos corretamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Please field all fields", Toast.LENGTH_SHORT).show()
                     }
                 },
                 onSwitchToLoginClick = { isLoginMode = true }
@@ -118,7 +116,6 @@ fun LoginForm(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Campo de email
         TextField(
             value = email,
             onValueChange = onEmailChange,
@@ -129,11 +126,10 @@ fun LoginForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de senha
         TextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Senha") },
+            label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
@@ -141,22 +137,20 @@ fun LoginForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botão de login
         Button(
             onClick = onLoginClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Entrar")
+            Text("Login")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Link para a tela de cadastro
         TextButton(
             onClick = onSwitchToRegisterClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Não tem uma conta? Criar conta", color = Color.Blue)
+            Text("Dont have account, Create One", color = Color.Blue)
         }
     }
 }
@@ -177,7 +171,6 @@ fun RegisterForm(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Campo de email
         TextField(
             value = email,
             onValueChange = onEmailChange,
@@ -188,11 +181,10 @@ fun RegisterForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de senha
         TextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Senha") },
+            label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
@@ -200,11 +192,10 @@ fun RegisterForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de confirmação de senha
         TextField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = { Text("Confirmar Senha") },
+            label = { Text("Confirm Password") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
@@ -212,22 +203,20 @@ fun RegisterForm(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botão de Registar
         Button(
             onClick = onCreateClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Criar Conta")
+            Text("Create Account")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Link para a tela de login
         TextButton(
             onClick = onSwitchToLoginClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Já tem uma conta? Entrar", color = Color.Blue)
+            Text("Already have a account? Login", color = Color.Blue)
         }
     }
 }
